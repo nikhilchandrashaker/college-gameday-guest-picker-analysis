@@ -1,0 +1,196 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>GameDay Guest Pickers</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: black masthead with red stripe, then three exhibits in a narrow column; ESPN College GameDay palette of red, black and white */
+:root{
+  --bg:#F1F1F1; --panel:#FFFFFF; --ink:#111111; --ink2:#444444; --muted:#767676; --rule:#D8D8D8;
+  --field:#CC0000; --field-soft:#F3CFCF; --flag:#111111; --bad:#CC0000; --band:#000000; --bandfg:#FFFFFF; --bandmute:#BDBDBD;
+  --display:'Barlow Condensed','Arial Narrow',sans-serif; --body:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0A0A0A; --panel:#171717; --ink:#F5F5F5; --ink2:#C2C2C2; --muted:#8A8A8A; --rule:#333333;
+  --field:#E8281E; --field-soft:#4A1613; --flag:#FFFFFF; --bad:#FF5A50; --band:#000000; --bandfg:#FFFFFF; --bandmute:#BDBDBD; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A0A0A; --panel:#171717; --ink:#F5F5F5; --ink2:#C2C2C2; --muted:#8A8A8A; --rule:#333333;
+  --field:#E8281E; --field-soft:#4A1613; --flag:#FFFFFF; --bad:#FF5A50; --band:#000000; --bandfg:#FFFFFF; --bandmute:#BDBDBD; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
+  padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));padding-block:32px 56px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
+h1,h2{font-family:var(--display);font-weight:700;text-wrap:balance;margin:0;line-height:1.02;letter-spacing:.005em}
+h1{font-size:clamp(40px,8vw,64px)}
+h2{font-size:clamp(26px,5vw,34px)}
+p{margin:0}
+.kick,.cap,.lab{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.mast{background:var(--band);color:var(--bandfg);border-top:8px solid var(--field);padding:24px 20px;display:flex;flex-direction:column;gap:16px}
+.mast .kick{color:var(--bandmute)}
+.mast .lede{color:var(--bandmute)}
+.mast .lede b{color:var(--bandfg)}
+.mast h1{color:var(--bandfg);text-transform:uppercase}
+.mast .score{background:#333;border-color:#333}
+.mast .score div{background:#111;color:#fff}
+.mast .score .lab{color:var(--bandmute)}
+.mast .score .num{color:#fff}
+h2{border-left:6px solid var(--field);padding-left:12px}
+.lede{font-size:18px;color:var(--ink2);max-width:62ch}
+.lede b,.take b{color:var(--ink);font-weight:600}
+.score{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.score div{background:var(--panel);padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.score .num{font-family:var(--display);font-weight:700;font-size:38px;line-height:1;font-variant-numeric:tabular-nums}
+section{display:flex;flex-direction:column;gap:16px}
+.take{color:var(--ink2);max-width:64ch}
+.panel{background:var(--panel);border:1px solid var(--rule);padding:18px 16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ctl .lab{margin-right:4px}
+button{font:500 13px var(--mono);color:var(--ink2);background:transparent;border:1px solid var(--rule);padding:6px 10px;cursor:pointer}
+button[aria-pressed="true"]{background:var(--field);border-color:var(--field);color:var(--bg)}
+button:focus-visible{outline:2px solid var(--field);outline-offset:2px}
+.rows{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:minmax(0,9.5rem) minmax(0,1fr) 5.6rem;gap:10px;align-items:center;font-size:14px}
+.row .nm{overflow-wrap:anywhere;line-height:1.2}
+.row .rec{font-family:var(--mono);font-size:12px;color:var(--ink2);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.track{position:relative;height:22px;background:linear-gradient(var(--rule),var(--rule)) 0 50%/100% 1px no-repeat}
+.bar{position:absolute;left:0;top:5px;height:12px;background:var(--field);border-radius:0 3px 3px 0}
+.wh{position:absolute;top:10px;height:2px;background:var(--ink)}
+.wh::before,.wh::after{content:"";position:absolute;top:-4px;width:2px;height:10px;background:var(--ink)}
+.wh::before{left:0}.wh::after{right:0}
+.base{position:absolute;top:-2px;bottom:-2px;width:0;border-left:2px dashed var(--flag)}
+.axis{display:grid;grid-template-columns:minmax(0,9.5rem) minmax(0,1fr) 5.6rem;gap:10px}
+.axis .scale{position:relative;height:16px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.axis .scale span{position:absolute;transform:translateX(-50%)}
+.axis .scale span:first-child{transform:none}.axis .scale span:last-child{transform:translateX(-100%)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--ink2)}
+.legend i{display:inline-block;width:12px;height:12px;margin-right:6px;vertical-align:-1px}
+svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+svg .ink{fill:var(--ink)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.fact{border-top:2px solid var(--ink);padding-top:8px;font-size:14px;color:var(--ink2)}
+.fact b{display:block;font-family:var(--display);font-size:28px;line-height:1.05;color:var(--ink);font-variant-numeric:tabular-nums}
+table{border-collapse:collapse;width:100%;font-size:14px}
+td,th{text-align:left;padding:8px 10px 8px 0;border-top:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:12px;font-weight:400;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-top:0}
+.scroll{overflow-x:auto}
+.note{font-size:14px;color:var(--ink2);border-left:3px solid var(--field);padding:2px 0 2px 12px;max-width:64ch}
+</style>
+
+<main class="wrap">
+<header class="mast">
+  <span class="kick">College GameDay · guest picker archive · 2004–2026</span>
+  <h1>Are the guest pickers any good?</h1>
+  <p class="lede">Across 2,554 graded picks, guests chose the winner <b>61.5%</b> of the time. Nobody with a real sample stands clearly above that line, and the luckiest and unluckiest records look like what chance alone produces.</p>
+  <div class="score">
+    <div><span class="num">61.5%</span><span class="lab">picks correct</span></div>
+    <div><span class="num">1,570–984</span><span class="lab">win–loss record</span></div>
+    <div><span class="num">220</span><span class="lab">guest pickers</span></div>
+    <div><span class="num">45</span><span class="lab">most picks by one guest</span></div>
+  </div>
+</header>
+
+<section id="s1">
+  <span class="kick">Exhibit 1 · All-time leaderboard</span>
+  <h2>Best of all time depends on how many picks you demand</h2>
+  <p class="take">No guest has more than 45 recorded picks, so thresholds of 50 and 100 picks leave nobody on the board. At 25 picks, <b>Joe Namath and Joel McHale</b> lead at 21–10 (67.7%). Lower the bar to 15 picks and Alex Rodriguez tops it at 20–4. The whisker on each bar is the 95% range of plausible true skill; every one of them reaches the dashed line, the guest average.</p>
+  <div class="panel">
+    <div class="ctl" role="group" aria-label="Minimum picks"><span class="lab">Min picks</span>
+      <button data-min="25" aria-pressed="true">25 (8 guests)</button><button data-min="20" aria-pressed="false">20 (19)</button><button data-min="15" aria-pressed="false">15 (32)</button></div>
+    <div class="ctl" role="group" aria-label="Order"><span class="lab">Show</span>
+      <button data-ord="best" aria-pressed="true">Best</button><button data-ord="worst" aria-pressed="false">Worst</button></div>
+    <div class="rows" id="rows"></div>
+    <div class="axis"><span></span><div class="scale"><span style="left:0">0%</span><span style="left:25%">25</span><span style="left:50%">50</span><span style="left:75%">75</span><span style="left:100%">100%</span></div><span></span></div>
+    <div class="legend"><span><i style="background:var(--field)"></i>Win % (bar)</span><span><i style="background:var(--ink);height:2px;vertical-align:3px"></i>95% range</span><span><i style="border-left:2px dashed var(--flag);width:0;height:12px"></i>All guests, 61.5%</span></div>
+  </div>
+  <p class="note">Joel McHale's official 2023 record differs from the picks the archive could identify, and Charles Barkley's 2004 data is incomplete (41 picks recorded over 8 appearances, 23 correct).</p>
+</section>
+
+<section id="s2">
+  <span class="kick">Exhibit 2 · Steve Young's perfect appearance</span>
+  <h2>Ten for ten is rare, and it has happened before</h2>
+  <p class="take">At 61.47% per pick, ten straight correct picks has a 0.77% chance, about 1 in 130. Seventy-five appearances in the archive had exactly ten picks, and <b>two of them were perfect</b>: Bubba Watson in 2013 and Steve Young in 2026. Luck alone would give 0.6 of those, so two is plausible (an 11% chance). Alex Rodriguez went 12 for 12 in 2017, the longest perfect slate on record.</p>
+  <div class="panel">
+    <div class="legend"><span><i style="background:var(--field)"></i>Actual appearances with 10 picks (n = 75)</span><span><i style="background:var(--ink);border-radius:50%"></i>Expected if every pick were a 61.5% shot</span></div>
+    <svg id="hist" viewBox="0 0 480 290" role="img" aria-label="Histogram of correct picks per ten-pick appearance, with the binomial expectation"></svg>
+    <div class="facts">
+      <div class="fact"><b>5 of 229</b>full slates (8+ picks) were perfect; luck predicts about 2, so perfection shows up a little more often than chance (5% odds)</div>
+      <div class="fact"><b>6.3 of 10</b>average score in a ten-pick appearance, in line with the 6.1 expected</div>
+    </div>
+  </div>
+</section>
+
+<section id="s3">
+  <span class="kick">Exhibit 3 · Skill or luck</span>
+  <h2>Guest records spread out exactly as luck predicts</h2>
+  <p class="take">Each dot is one guest. The funnel marks where a 61.5% picker would land 95% of the time at each sample size. Small samples swing wildly, which is why 100% and 10% records appear. <b>13 of 220 guests fall outside the funnel</b>, and chance alone puts about 11 there. Among guests with 25+ picks, spread is smaller than luck alone predicts (p = 0.80).</p>
+  <div class="panel">
+    <div class="legend"><span><i style="background:var(--field);border-radius:50%"></i>Guest picker</span><span><i style="background:var(--flag);border-radius:50%"></i>Steve Young</span><span><i style="border-top:2px dashed var(--muted);height:0;vertical-align:4px"></i>95% luck funnel</span></div>
+    <svg id="fun" viewBox="0 0 520 340" role="img" aria-label="Funnel plot of guest win percentage against number of picks"></svg>
+  </div>
+  <div class="note"><b>Not yet tested: guests versus betting favorites.</b> That comparison needs closing spreads for each of the 2,554 games, which are not in the dataset. With them, the question becomes whether guests beat the favorite pick, and the funnel above becomes a funnel around the favorite's win rate.</div>
+</section>
+
+<section>
+  <span class="kick">Other checks</span>
+  <h2>What else the data says</h2>
+  <div class="panel scroll">
+  <table><thead><tr><th>Question</th><th>Result</th></tr></thead><tbody>
+    <tr><td>Has accuracy changed over time?</td><td>No clear trend. Seasons with 25+ picks range 55.6% (2012) to 67.1% (2017); the slope is +0.15 points a season (p = 0.45).</td></tr>
+    <tr><td>Do repeat guests improve?</td><td>No. Win rate by appearance number: 62.1% (1st), 60.9% (2nd), 56.7% (3rd), 48.8% (4th or later, 43 picks).</td></tr>
+    <tr><td>Are some guests unusually consistent?</td><td>No. Among the 8 guests with 25+ picks, the spread matches binomial luck (χ² = 3.9 on 7 d.f.).</td></tr>
+    <tr><td>Former athletes, school loyalty</td><td>Need guest categories and school affiliations, which are not in the data yet.</td></tr>
+  </tbody></table></div>
+</section>
+<p class="cap">Source: Cole's Gameday Blog archival picks, viewed 2026-10-18 · Perfect slate = 8+ picks, all correct</p>
+</main>
+
+<script>
+const D={"lb":[["AJ Hawk",19,9,2,0,0],["Aaron Donald",9,6,1,0,0],["Aaron Rodgers",10,8,1,0,0],["Aidan Hutchinson",19,12,2,0,0],["Alex Bregman",13,7,1,0,0],["Alex Caruso",4,2,2,0,0],["Alex Rodriguez",24,20,2,1,1],["Alex Smith",8,5,1,0,0],["Alice Cooper",11,8,1,0,0],["Amanda Beard",10,4,1,0,0],["Archie Griffin",10,4,1,0,0],["Ashton Eaton",9,4,1,0,0],["Ashton Kutcher",11,6,1,0,0],["Baker Mayfield",12,9,1,0,0],["Bianca Belair",11,7,1,0,0],["Big Boi",9,8,1,0,0],["Bill Belichick",1,0,1,0,0],["Bill Goldberg",4,4,1,0,0],["Bill Murray",14,6,2,0,0],["Bill Walton",11,5,1,0,0],["Blake Griffin",10,9,1,0,0],["Blake Shelton",10,5,1,0,0],["Bo Jackson",22,17,2,0,0],["Bob Baffert",10,7,1,0,0],["Bob Huggins",10,7,1,0,0],["Bobby Bowden",9,7,1,0,0],["Bobby Knight",11,7,1,0,0],["Brad Paisley",18,12,2,0,0],["Braden Pape",11,6,1,0,0],["Brent Musburger",10,4,1,0,0],["Brian Bosworth",12,5,2,0,0],["Brian Wilson",9,4,1,0,0],["Brock Jensen",10,6,1,0,0],["Bruce Smith",10,7,1,0,0],["Bryce Harper",13,11,1,0,0],["Bryce Young",11,5,1,0,0],["Bubba Watson",10,10,1,1,1],["CJ Stroud",11,8,1,0,0],["Caitlin Clark",10,5,1,0,0],["Candace Parker",7,1,1,0,-1],["Carl Lewis",10,5,1,0,0],["Chainsmokers",23,13,2,0,0],["Charles Barkley",41,23,8,0,0],["Chase Claypool",10,8,1,0,0],["Chip Joanna Gaines",12,4,1,0,-1],["Chipper Jones",9,5,1,0,0],["Chris Fallica",9,4,1,0,0],["Chris Odonnell",13,10,1,0,0],["Chris Paul",7,3,1,0,0],["Christian Wilkins",11,9,1,0,0],["Cody Rhodes",10,7,1,0,0],["Condoleezza Rice",9,6,1,0,0],["Craig T Nelson",9,7,1,0,0],["Curtis Sharp",12,6,1,0,0],["Dale Earnhardt Jr",10,5,1,0,0],["Dallas Clark",7,2,1,0,0],["Danica Patrick",11,8,1,0,0],["Darius Rucker",22,13,2,0,0],["Dawn Staley",12,9,1,0,0],["Derek Poundstone",10,6,1,0,0],["Derrick Henry",11,5,2,0,0],["Dierks Bentley",8,4,1,0,0],["Draymond Green",8,5,1,0,0],["Drew Bledsoe",14,11,1,0,0],["Drew Brees",11,5,1,0,0],["Dude Perfect",11,7,1,0,0],["Dustin Johnson",10,8,1,0,0],["Eddie George",31,19,4,0,0],["Emmitt Smith",12,10,1,0,0],["Eric Church",34,21,3,0,0],["Eric Decker",11,6,1,0,0],["Eric Stonestreet",18,7,2,0,-1],["Ernie Johnson",6,4,2,0,0],["Evander Holyfield",14,8,1,0,0],["Frank Caliendo",10,8,1,0,0],["Gabrielle Reece",10,6,1,0,0],["Gabrielle Union",13,7,1,0,0],["Gene Wojciechowski",10,4,1,0,0],["Glen Powell",21,14,2,0,0],["Greg Jennings",10,8,1,0,0],["Harris English",10,5,1,0,0],["Hope Solo",9,4,1,0,0],["Hugh McConnell",5,3,1,0,0],["Jack Harlow",10,7,1,0,0],["Jack Nicklaus",17,10,2,0,0],["Jake Olsen",10,6,1,0,0],["Jake Owen",10,9,2,1,0],["Jake Peavy",9,6,1,0,0],["Jase Robertson",9,9,1,1,1],["Jeezy",13,7,1,0,0],["Jeff Dunham",8,4,1,0,0],["Jeff Foxworthy",11,7,1,0,0],["Jeff Van Gundy",9,4,1,0,0],["Jelly Roll",8,6,1,0,0],["Jerry Ferrara",9,5,1,0,0],["Jerry Jones",7,6,1,0,0],["Jerry Lawler",12,9,1,0,0],["Jim Cantore",8,5,1,0,0],["Jim Plunkett",10,7,1,0,0],["Joe Namath",31,21,3,0,0],["Joel McHale",31,21,3,0,0],["Joey Chesnut",6,5,1,0,0],["John Goodman",13,12,1,0,1],["John Stockton",7,6,1,0,0],["Johnny Knoxville",10,2,1,0,-1],["Johnny Manziel",9,5,1,0,0],["Jonathan Papelbon",9,5,1,0,0],["Jordan Spieth",10,6,1,0,0],["Justin Fields",10,6,1,0,0],["Justin Thomas",12,5,1,0,0],["Kaitlin Olson",10,6,1,0,0],["Kane Brown",12,9,1,0,0],["Katy Perry",9,7,1,0,0],["Keegan Michael Key",45,29,4,0,0],["Ken Griffey Jr",9,6,1,0,0],["Ken Jeong",21,12,2,0,0],["Kenny Chesney",22,11,3,0,0],["Ki-Jana Carter",9,8,1,0,0],["Kyle Schwarber",9,8,1,0,0],["LaDainian Tomlinson",9,7,1,0,0],["LaVar Arrington",10,5,1,0,0],["Laila Ali",9,5,1,0,0],["Lainey Wilson",5,5,1,0,0],["Lance Armstrong",10,7,1,0,0],["Landon Donovan",10,5,1,0,0],["Lane Kiffin",23,16,3,0,0],["Lara Spencer",13,9,1,0,0],["Lavell Edwards",10,7,1,0,0],["Lebron James",10,5,1,0,0],["Lil Wayne",10,7,1,0,0],["Livvy Dunne Paul Skenes",9,5,1,0,0],["Lolo Jones",10,6,1,0,0],["Luke Bryan",22,16,2,0,0],["Luke Combs",12,6,1,0,0],["Luther Campbell",9,5,1,0,0],["Lyle Lovett",8,5,1,0,0],["Magic Johnson",6,3,2,0,0],["Marcus Luttrell",9,5,1,0,0],["Marcus Mariota",9,3,1,0,0],["Marcus Smart",11,5,1,0,0],["Mark Cuban",29,14,3,0,0],["Mark Harmon",6,3,1,0,0],["Marshawn Lynch",12,6,1,0,0],["Mateen Cleaves",9,4,1,0,0],["Matt Birk",10,5,1,0,0],["Matt Ryan",10,6,1,0,0],["Matthew Mcconaughey",11,9,1,0,0],["Matthew Tkachuk",6,4,1,0,0],["Maury Povich",14,10,1,0,0],["Michael Irvin",4,1,1,0,0],["Michael Phelps",9,4,1,0,0],["Mike Ditka",10,8,1,0,0],["Mike Singletary",7,4,1,0,0],["Morgan Freeman",10,7,1,0,0],["Ms Terry",9,7,1,0,0],["Nate Bargatze",19,13,2,0,0],["Nathan Followill",19,7,2,0,-1],["Nick Faldo",9,7,1,0,0],["Nick Lachey",12,9,1,0,0],["Nick Swisher",9,8,1,0,0],["Nolan Smith",11,9,1,0,0],["Omari Hardwick",11,7,1,0,0],["Oregon Duck",8,5,1,0,0],["Orlando Pace",10,7,1,0,0],["Owen Gray",11,6,1,0,0],["PFT Commenter",9,3,1,0,0],["Pat McAfee",14,7,1,0,0],["Patrick Mahomes",7,6,1,0,0],["Pete Dawkins",8,3,2,0,0],["Peyton Manning",10,7,1,0,0],["Phil Hansen",9,4,1,0,0],["Phil Knight",10,7,1,0,0],["Phillip Fulmer",11,5,1,0,0],["Philly Phanatic",7,4,1,0,0],["Picabo Street",9,6,1,0,0],["Quavo",11,6,1,0,0],["Ric Flair",10,6,1,0,0],["Rick Pitino",11,6,1,0,0],["Rick Ross",9,5,1,0,0],["Rickie Fowler",11,7,1,0,0],["Ricky Carmichael",7,2,1,0,0],["Rob Riggle",19,7,3,0,-1],["Roger Staubach",7,4,2,0,0],["Roman Reigns",10,6,1,0,0],["Ryan Lochte",10,8,1,0,0],["Ryan Riess",6,4,1,0,0],["Sabrina Ionescu",21,13,2,0,0],["Sam Hunt",9,8,1,0,0],["Santonio Holmes",8,2,1,0,-1],["Saquon Barkley",12,6,1,0,0],["Scottie Scheffler",10,7,1,0,0],["Sebastian Maniscalco",12,8,1,0,0],["Shane Gillis",1,1,1,0,0],["Sheamus",4,3,2,0,0],["Spike Thomas",10,7,1,0,0],["Stephen A Smith",12,7,1,0,0],["Stephen Phillips",5,3,1,0,0],["Steve Austin",9,5,1,0,0],["Steve Smith Sr",10,4,1,0,0],["Steve Spurrier",21,10,2,0,0],["Steve Young",10,10,1,1,1],["Stugotz",11,6,1,0,0],["Tedy Bruschi",9,6,1,0,0],["The Rock",10,8,1,0,0],["Theo Von",15,8,2,0,0],["Thurman Thomas",11,8,1,0,0],["Tim Matheson",16,11,1,0,0],["Tim McGraw",10,9,1,0,0],["Timothee Chalamet",7,4,1,0,0],["Toby Keith",13,7,1,0,0],["Trace McSorley",11,8,1,0,0],["Trae Young",18,13,2,0,0],["Twenty One Pilots",10,7,1,0,0],["Ty Burrell",5,2,1,0,0],["Verne Lundquist",8,3,1,0,0],["Vince Vaughn",35,22,3,0,0],["Warren Moon",9,5,1,0,0],["Will Ferrell",10,5,1,0,0],["Willie Robertson",19,7,2,0,-1],["Zac Brown",18,11,2,0,0]],"obs":[0,0,1,2,7,12,18,20,11,2,2],"exp":[0.01,0.09,0.62,2.63,7.36,14.08,18.73,17.07,10.22,3.62,0.58]};
+const P=1570/2554;
+const rowsEl=document.getElementById('rows');
+const st={min:25,ord:'best'};
+function wilson(c,n){const z=1.96,p=c/n,d=1+z*z/n,m=(p+z*z/(2*n))/d,h=z*Math.sqrt(p*(1-p)/n+z*z/(4*n*n))/d;return[m-h,m+h]}
+function drawRows(){
+  const L=D.lb.filter(r=>r[1]>=st.min).map(r=>({nm:r[0],n:r[1],c:r[2],p:r[2]/r[1]})).sort((a,b)=>st.ord==='best'?b.p-a.p||b.n-a.n:a.p-b.p||b.n-a.n).slice(0,10);
+  rowsEl.innerHTML=L.map(r=>{const[lo,hi]=wilson(r.c,r.n);
+    return `<div class="row" title="${r.nm}: ${r.c} of ${r.n} correct"><span class="nm">${r.nm}</span><div class="track"><div class="bar" style="width:${r.p*100}%"></div><div class="wh" style="left:${lo*100}%;width:${(hi-lo)*100}%"></div><div class="base" style="left:${P*100}%"></div></div><span class="rec">${r.c}–${r.n-r.c} · ${(r.p*100).toFixed(1)}%</span></div>`}).join('');
+}
+document.querySelectorAll('button[data-min]').forEach(b=>b.onclick=()=>{st.min=+b.dataset.min;document.querySelectorAll('button[data-min]').forEach(x=>x.setAttribute('aria-pressed',x===b));drawRows()});
+document.querySelectorAll('button[data-ord]').forEach(b=>b.onclick=()=>{st.ord=b.dataset.ord;document.querySelectorAll('button[data-ord]').forEach(x=>x.setAttribute('aria-pressed',x===b));drawRows()});
+drawRows();
+const NS='http://www.w3.org/2000/svg';
+function el(p,t,a,txt){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;p.appendChild(e);return e}
+/* histogram */
+(function(){const s=document.getElementById('hist');const W=480,H=290,m={l:34,r:8,t:14,b:48};
+ const iw=W-m.l-m.r,ih=H-m.t-m.b,ymax=24,bw=iw/11;
+ const y=v=>m.t+ih-v/ymax*ih,x=k=>m.l+k*bw;
+ for(let v=0;v<=ymax;v+=6){el(s,'line',{x1:m.l,x2:W-m.r,y1:y(v),y2:y(v),stroke:'var(--rule)'});el(s,'text',{x:m.l-6,y:y(v)+4,'text-anchor':'end'},v)}
+ D.obs.forEach((v,k)=>{const hot=k===10;
+  if(v>0)el(s,'rect',{x:x(k)+4,y:y(v),width:bw-8,height:y(0)-y(v),fill:hot?'var(--flag)':'var(--field)',rx:2}).appendChild(document.createElementNS(NS,'title')).textContent=`${v} appearances went ${k} for 10`;
+  if(v>0)el(s,'text',{x:x(k)+bw/2,y:y(v)-5,'text-anchor':'middle',class:'ink'},v);
+  el(s,'circle',{cx:x(k)+bw/2,cy:y(D.exp[k]),r:4.5,fill:'var(--ink)',stroke:'var(--panel)','stroke-width':2}).appendChild(document.createElementNS(NS,'title')).textContent=`Luck expects ${D.exp[k]} at ${k} for 10`;
+  el(s,'text',{x:x(k)+bw/2,y:H-m.b+16,'text-anchor':'middle'},k)});
+ el(s,'text',{x:m.l+iw/2,y:H-8,'text-anchor':'middle'},'Correct picks out of 10');
+ el(s,'text',{x:x(10)+bw/2-4,y:y(2)-22,'text-anchor':'end',fill:'var(--flag)',style:'fill:var(--ink);font-weight:600'},'Young, Watson');
+})();
+/* funnel */
+(function(){const s=document.getElementById('fun');const W=520,H=340,m={l:38,r:10,t:10,b:44};
+ const iw=W-m.l-m.r,ih=H-m.t-m.b,xmax=48;
+ const x=n=>m.l+n/xmax*iw,y=p=>m.t+ih-p*ih;
+ for(let p=0;p<=1;p+=.25){el(s,'line',{x1:m.l,x2:W-m.r,y1:y(p),y2:y(p),stroke:'var(--rule)'});el(s,'text',{x:m.l-6,y:y(p)+4,'text-anchor':'end'},Math.round(p*100)+'%')}
+ for(let n=0;n<=xmax;n+=12)el(s,'text',{x:x(n),y:H-m.b+16,'text-anchor':'middle'},n);
+ el(s,'text',{x:m.l+iw/2,y:H-8,'text-anchor':'middle'},'Picks recorded for the guest');
+ const hi=[],lo=[];for(let n=4;n<=xmax;n+=.5){const se=1.96*Math.sqrt(P*(1-P)/n);hi.push([x(n),y(Math.min(1,P+se))]);lo.push([x(n),y(Math.max(0,P-se))])}
+ const path=a=>a.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join('');
+ el(s,'path',{d:path(hi),fill:'none',stroke:'var(--muted)','stroke-width':1.5,'stroke-dasharray':'5 4'});
+ el(s,'path',{d:path(lo),fill:'none',stroke:'var(--muted)','stroke-width':1.5,'stroke-dasharray':'5 4'});
+ el(s,'line',{x1:m.l,x2:W-m.r,y1:y(P),y2:y(P),stroke:'var(--flag)','stroke-width':1.5});
+ el(s,'text',{x:W-m.r-2,y:y(P)-5,'text-anchor':'end',style:'fill:var(--flag)'},'61.5% average');
+ const lab=['Alex Rodriguez','Steve Young','Rob Riggle'];
+ D.lb.slice().sort((a,b)=>a[1]-b[1]).forEach(r=>{const yo=r[0]==='Steve Young';
+  const c=el(s,'circle',{cx:x(r[1]),cy:y(r[2]/r[1]),r:yo?6:4.5,fill:yo?'var(--flag)':'var(--field)','fill-opacity':yo?1:.5,stroke:'var(--panel)','stroke-width':1.5});
+  c.appendChild(document.createElementNS(NS,'title')).textContent=`${r[0]}: ${r[2]} of ${r[1]}`});
+ [['Alex Rodriguez',24,20,'start',8,-4],['Steve Young',10,10,'start',10,-8],['Rob Riggle',19,7,'start',8,14]].forEach(([nm,n,c,a,dx,dy])=>el(s,'text',{x:x(n)+dx,y:y(c/n)+dy,'text-anchor':a,class:'ink'},nm));
+})();
+</script>
+
+</body></html>
